@@ -1,7 +1,6 @@
 <template>
   <div class="report-page">
 
-
     <!-- CONTENIDO -->
     <div class="page-body">
 
@@ -73,7 +72,7 @@
                     class="tipo-btn"
                     :class="{ selected: form.tipo === t.id }"
                     :style="{ '--tc': t.color }"
-                    @click="form.tipo = t.id; errors.tipo = false"
+                    @click="seleccionarTipo(t.id)"
                   >
                     <span class="tipo-icon">{{ t.icon }}</span>
                     <span class="tipo-label">{{ t.label }}</span>
@@ -139,57 +138,65 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive } from 'vue'
+<script>
+export default {
+  name: 'ReportarView',
+  data() {
+    return {
+      enviado: false,
+      cargando: false,
+      form: {
+        barrio: '',
+        tipo: '',
+        descripcion: '',
+        urgencia: 'media',
+      },
+      errors: {
+        barrio: false,
+        tipo: false,
+        descripcion: false,
+      },
+      tipos: [
+        { id: 'sin-agua',      label: 'Sin agua',     icon: '🚱', color: '#ef4444' },
+        { id: 'baja-presion',  label: 'Baja presión', icon: '📉', color: '#f97316' },
+        { id: 'agua-sucia',    label: 'Agua sucia',   icon: '🟤', color: '#a16207' },
+        { id: 'fuga',          label: 'Fuga',         icon: '🔧', color: '#0ea5e9' },
+      ],
+      urgencias: [
+        { id: 'baja',  label: 'Baja',  icon: '🟢', color: '#16a34a' },
+        { id: 'media', label: 'Media', icon: '🟠', color: '#ea580c' },
+        { id: 'alta',  label: 'Alta',  icon: '🔴', color: '#dc2626' },
+      ],
+      pasos: [
+        { title: 'Completa el formulario', desc: 'Indica tu barrio, tipo de problema y descripción.' },
+        { title: 'Se publica en el mapa',  desc: 'El reporte aparece de inmediato para todos.' },
+        { title: 'La comunidad lo ve',     desc: 'Otros ciudadanos pueden confirmar el problema.' },
+      ],
+    }
+  },
+  methods: {
+    seleccionarTipo(id) {
+      this.form.tipo = id
+      this.errors.tipo = false
+    },
+    enviar() {
+      this.errors.barrio      = !this.form.barrio.trim()
+      this.errors.tipo        = !this.form.tipo
+      this.errors.descripcion = this.form.descripcion.trim().length < 10
 
-const enviado  = ref(false)
-const cargando = ref(false)
+      if (this.errors.barrio || this.errors.tipo || this.errors.descripcion) return
 
-const form = reactive({
-  barrio: '',
-  tipo: '',
-  descripcion: '',
-  urgencia: 'media',
-})
-
-const errors = reactive({ barrio: false, tipo: false, descripcion: false })
-
-const tipos = [
-  { id: 'sin-agua',     label: 'Sin agua',     icon: '🚱', color: '#ef4444' },
-  { id: 'baja-presion', label: 'Baja presión', icon: '📉', color: '#f97316' },
-  { id: 'agua-sucia',   label: 'Agua sucia',   icon: '🟤', color: '#a16207' },
-  { id: 'fuga',         label: 'Fuga',         icon: '🔧', color: '#0ea5e9' },
-]
-
-const urgencias = [
-  { id: 'baja',  label: 'Baja',  icon: '🟢', color: '#16a34a' },
-  { id: 'media', label: 'Media', icon: '🟠', color: '#ea580c' },
-  { id: 'alta',  label: 'Alta',  icon: '🔴', color: '#dc2626' },
-]
-
-const pasos = [
-  { title: 'Completa el formulario', desc: 'Indica tu barrio, tipo de problema y descripción.' },
-  { title: 'Se publica en el mapa',  desc: 'El reporte aparece de inmediato para todos.' },
-  { title: 'La comunidad lo ve',     desc: 'Otros ciudadanos pueden confirmar el problema.' },
-]
-
-function enviar() {
-  errors.barrio      = !form.barrio.trim()
-  errors.tipo        = !form.tipo
-  errors.descripcion = form.descripcion.trim().length < 10
-
-  if (errors.barrio || errors.tipo || errors.descripcion) return
-
-  cargando.value = true
-  setTimeout(() => {
-    cargando.value = false
-    enviado.value  = true
-  }, 1200)
+      this.cargando = true
+      setTimeout(() => {
+        this.cargando = false
+        this.enviado  = true
+      }, 1200)
+    },
+  },
 }
 </script>
 
 <style scoped>
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 .report-page {
   font-family: 'Inter', sans-serif;
@@ -204,7 +211,6 @@ function enviar() {
   margin: 0 auto;
   padding: 0 24px;
 }
-
 
 /* ── BODY ── */
 .page-body {
@@ -264,17 +270,8 @@ function enviar() {
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.info-step strong {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-.info-step p {
-  font-size: 13px;
-  color: #64748b;
-  line-height: 1.5;
-}
+.info-step strong { display: block; font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.info-step p { font-size: 13px; color: #64748b; line-height: 1.5; }
 .info-badge {
   display: flex;
   gap: 12px;
@@ -295,26 +292,13 @@ function enviar() {
   padding: 36px;
   box-shadow: 0 8px 40px rgba(3,105,161,0.08);
 }
-.form-title {
-  font-family: 'Sora', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-.form-sub {
-  font-size: 14px;
-  color: #64748b;
-  margin-bottom: 28px;
-}
+.form-title { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+.form-sub { font-size: 14px; color: #64748b; margin-bottom: 28px; }
 .form-body { display: flex; flex-direction: column; gap: 22px; }
 
 /* ── FIELDS ── */
 .field { display: flex; flex-direction: column; gap: 6px; }
-.field label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #334155;
-}
+.field label { font-size: 13px; font-weight: 600; color: #334155; }
 .required { color: #ef4444; margin-left: 2px; }
 .field input,
 .field textarea {
@@ -340,19 +324,12 @@ function enviar() {
   border-color: #ef4444;
   box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
 }
-.field-footer {
-  display: flex;
-  justify-content: flex-end;
-}
+.field-footer { display: flex; justify-content: flex-end; }
 .char-count { font-size: 11px; color: #94a3b8; }
 .field-error { font-size: 12px; color: #ef4444; }
 
 /* ── TIPO GRID ── */
-.tipo-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+.tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .tipo-btn {
   display: flex;
   align-items: center;
@@ -444,11 +421,7 @@ function enviar() {
   gap: 12px;
 }
 .success-icon { font-size: 52px; }
-.success-state h3 {
-  font-family: 'Sora', sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-}
+.success-state h3 { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; }
 .success-state p { color: #64748b; font-size: 15px; }
 .btn-main {
   display: inline-block;
@@ -472,12 +445,7 @@ function enviar() {
 }
 
 /* ── FOOTER ── */
-.footer {
-  background: #0f172a;
-  color: #64748b;
-  padding: 24px 0;
-  font-size: 13px;
-}
+.footer { background: #0f172a; color: #64748b; padding: 24px 0; font-size: 13px; }
 .footer-inner {
   display: flex;
   align-items: center;

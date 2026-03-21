@@ -40,8 +40,13 @@
         </div>
       </div>
 
+      <!-- BOTÓN TOGGLE PANEL -->
+      <button class="toggle-panel" @click="mostrarPanel = !mostrarPanel">
+        {{ mostrarPanel ? '✕ Ocultar panel' : '☰ Ver reportes' }}
+      </button>
+
       <!-- PANEL LATERAL -->
-      <aside class="side-panel">
+      <aside class="side-panel" v-show="mostrarPanel">
         <div class="panel-header">
           <h3>Reportes recientes</h3>
           <span class="panel-count">{{ reportesFiltrados.length }} reportes</span>
@@ -104,12 +109,13 @@ export default {
   data() {
     return {
       filtroActivo: 'todos',
+      mostrarPanel: true,
       filtros: [
-        { id: 'todos',        label: 'Todos',       icon: '🗺️', color: '#0369a1' },
-        { id: 'Sin agua',     label: 'Sin agua',    icon: '🚱', color: '#ef4444' },
-        { id: 'Baja presión', label: 'Baja presión',icon: '📉', color: '#f97316' },
-        { id: 'Agua sucia',   label: 'Agua sucia',  icon: '🟤', color: '#a16207' },
-        { id: 'Fuga',         label: 'Fugas',       icon: '🔧', color: '#0ea5e9' },
+        { id: 'todos',        label: 'Todos',        icon: '🗺️', color: '#0369a1' },
+        { id: 'Sin agua',     label: 'Sin agua',     icon: '🚱', color: '#ef4444' },
+        { id: 'Baja presión', label: 'Baja presión', icon: '📉', color: '#f97316' },
+        { id: 'Agua sucia',   label: 'Agua sucia',   icon: '🟤', color: '#a16207' },
+        { id: 'Fuga',         label: 'Fugas',        icon: '🔧', color: '#0ea5e9' },
       ],
       marcadores: [],
       map: null,
@@ -171,7 +177,6 @@ export default {
   margin: 0 auto;
   padding: 0 24px;
 }
-
 
 /* ── PAGE HEADER ── */
 .page-header {
@@ -257,6 +262,24 @@ export default {
   padding-bottom: 48px;
   align-items: start;
 }
+
+/* ── TOGGLE PANEL ── */
+.toggle-panel {
+  display: none;
+  grid-column: 1 / -1;
+  padding: 8px 18px;
+  background: #0369a1;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background .2s;
+  justify-self: start;
+}
+.toggle-panel:hover { background: #0284c7; }
 
 /* ── MAPA ── */
 .map-wrapper { position: relative; }
@@ -422,5 +445,6 @@ export default {
 @media (max-width: 768px) {
   .map-layout { grid-template-columns: 1fr; }
   #map { height: 380px; }
+  .toggle-panel { display: block; }
 }
 </style>

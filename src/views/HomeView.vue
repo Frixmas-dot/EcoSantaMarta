@@ -27,7 +27,6 @@
           </router-link>
         </div>
 
-        <!-- STATS con contadores animados -->
         <div class="hero-stats">
           <div class="stat">
             <strong>{{ counters.reportes }}</strong>
@@ -140,47 +139,50 @@
   </div>
 </template>
 
-<script setup>
-import { reactive, onMounted } from 'vue'
-
-// ── Datos ──────────────────────────────────────────────────
-const problemas = [
-  { id: 1, icon: '🚱', title: 'Sin agua',     desc: 'Corte total del servicio en el sector.', color: '#ef4444' },
-  { id: 2, icon: '📉', title: 'Baja presión', desc: 'El agua llega con muy poca fuerza.',     color: '#f97316' },
-  { id: 3, icon: '🟤', title: 'Agua sucia',   desc: 'Agua con color, olor o sedimentos.',     color: '#a16207' },
-  { id: 4, icon: '🔧', title: 'Fuga o ruptura', desc: 'Tubería rota o fuga visible en la calle.', color: '#0ea5e9' },
-]
-
-const pasos = [
-  { icon: '📝', title: 'Reporta',      desc: 'Describe el problema e indica tu dirección o barrio.' },
-  { icon: '🗺️', title: 'Se publica',   desc: 'El reporte aparece en el mapa público en segundos.' },
-  { icon: '👥', title: 'Se visibiliza', desc: 'Otros ciudadanos confirman el problema en su zona.' },
-  { icon: '📢', title: 'Se escala',    desc: 'Las zonas críticas reciben mayor atención y presión.' },
-]
-
-// ── Contadores animados ────────────────────────────────────
-const counters = reactive({ reportes: 0, barrios: 0, verificados: 0 })
-
-function animateCounter(key, target, duration = 1600) {
-  const start = performance.now()
-  const update = (now) => {
-    const progress = Math.min((now - start) / duration, 1)
-    // Ease out cubic: desacelera al final
-    const eased = 1 - Math.pow(1 - progress, 3)
-    counters[key] = Math.round(eased * target)
-    if (progress < 1) requestAnimationFrame(update)
-  }
-  requestAnimationFrame(update)
+<script>
+export default {
+  name: 'HomeView',
+  data() {
+    return {
+      counters: {
+        reportes: 0,
+        barrios: 0,
+        verificados: 0,
+      },
+      problemas: [
+        { id: 1, icon: '🚱', title: 'Sin agua',       desc: 'Corte total del servicio en el sector.',   color: '#ef4444' },
+        { id: 2, icon: '📉', title: 'Baja presión',   desc: 'El agua llega con muy poca fuerza.',       color: '#f97316' },
+        { id: 3, icon: '🟤', title: 'Agua sucia',     desc: 'Agua con color, olor o sedimentos.',       color: '#a16207' },
+        { id: 4, icon: '🔧', title: 'Fuga o ruptura', desc: 'Tubería rota o fuga visible en la calle.', color: '#0ea5e9' },
+      ],
+      pasos: [
+        { icon: '📝', title: 'Reporta',       desc: 'Describe el problema e indica tu dirección o barrio.' },
+        { icon: '🗺️', title: 'Se publica',    desc: 'El reporte aparece en el mapa público en segundos.' },
+        { icon: '👥', title: 'Se visibiliza', desc: 'Otros ciudadanos confirman el problema en su zona.' },
+        { icon: '📢', title: 'Se escala',     desc: 'Las zonas críticas reciben mayor atención y presión.' },
+      ],
+    }
+  },
+  mounted() {
+    setTimeout(() => {
+      this.animateCounter('reportes',   312, 1800)
+      this.animateCounter('barrios',     18, 1400)
+      this.animateCounter('verificados', 94, 1600)
+    }, 300)
+  },
+  methods: {
+    animateCounter(key, target, duration) {
+      const start = performance.now()
+      const update = (now) => {
+        const progress = Math.min((now - start) / duration, 1)
+        const eased = 1 - Math.pow(1 - progress, 3)
+        this.counters[key] = Math.round(eased * target)
+        if (progress < 1) requestAnimationFrame(update)
+      }
+      requestAnimationFrame(update)
+    },
+  },
 }
-
-onMounted(() => {
-  // Pequeño delay para que el usuario vea el 0 antes de que arranquen
-  setTimeout(() => {
-    animateCounter('reportes',    312, 1800)
-    animateCounter('barrios',      18, 1400)
-    animateCounter('verificados',  94, 1600)
-  }, 300)
-})
 </script>
 
 <style scoped>
@@ -249,8 +251,6 @@ onMounted(() => {
   flex-direction: column;
   align-items: flex-start;
   max-width: 680px;
-
-  /* Entrada suave de todo el bloque */
   animation: heroIn 0.8s ease both;
 }
 @keyframes heroIn {
@@ -281,7 +281,6 @@ onMounted(() => {
   animation: heroIn 0.8s ease 0.2s both;
 }
 
-/* Subrayado animado al cargar */
 .hero-highlight {
   color: #0369a1;
   position: relative;
@@ -298,9 +297,7 @@ onMounted(() => {
   width: 0;
   animation: underlineGrow 0.7s ease 0.9s forwards;
 }
-@keyframes underlineGrow {
-  to { width: 100%; }
-}
+@keyframes underlineGrow { to { width: 100%; } }
 
 .hero-sub {
   font-size: 18px;
@@ -364,7 +361,6 @@ onMounted(() => {
   font-size: 32px;
   font-weight: 800;
   color: #0369a1;
-  /* shimmer sutil mientras el contador corre */
   background: linear-gradient(90deg, #0369a1 0%, #0ea5e9 50%, #0369a1 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
@@ -391,10 +387,7 @@ onMounted(() => {
 /* ── SECTIONS ── */
 .section { padding: 96px 0; }
 .section-alt { background: #f8fafc; }
-.section-header {
-  text-align: center;
-  margin-bottom: 56px;
-}
+.section-header { text-align: center; margin-bottom: 56px; }
 .section-label {
   font-size: 12px;
   font-weight: 600;
@@ -410,10 +403,7 @@ onMounted(() => {
   color: #0f172a;
   margin: 0 0 12px;
 }
-.section-desc {
-  color: #64748b;
-  font-size: 16px;
-}
+.section-desc { color: #64748b; font-size: 16px; }
 
 /* ── PROBLEM CARDS ── */
 .problem-grid {
@@ -443,7 +433,6 @@ onMounted(() => {
   background: var(--accent);
   border-radius: 4px 0 0 4px;
 }
-/* Fondo con el color del acento, muy sutil al hover */
 .problem-card::after {
   content: '';
   position: absolute;
@@ -459,21 +448,14 @@ onMounted(() => {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
 }
 .problem-card:hover::after { opacity: 0.04; }
-.problem-icon {
-  font-size: 32px;
-  flex-shrink: 0;
-}
+.problem-icon { font-size: 32px; flex-shrink: 0; }
 .problem-body h3 {
   font-family: 'Sora', sans-serif;
   font-size: 16px;
   font-weight: 700;
   margin: 0 0 4px;
 }
-.problem-body p {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
-}
+.problem-body p { font-size: 13px; color: #64748b; margin: 0; }
 .problem-arrow {
   margin-left: auto;
   color: #94a3b8;
@@ -491,7 +473,6 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 32px;
-  position: relative;
 }
 .step {
   background: white;
@@ -525,19 +506,10 @@ onMounted(() => {
   font-weight: 700;
   margin: 0 0 8px;
 }
-.step p {
-  font-size: 13px;
-  color: #64748b;
-  line-height: 1.6;
-  margin: 0;
-}
+.step p { font-size: 13px; color: #64748b; line-height: 1.6; margin: 0; }
 
 /* ── MAP TEASER ── */
-.map-teaser {
-  background: #0f172a;
-  padding: 96px 0;
-  color: white;
-}
+.map-teaser { background: #0f172a; padding: 96px 0; color: white; }
 .map-inner {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -551,12 +523,7 @@ onMounted(() => {
   font-weight: 800;
   margin: 8px 0 16px;
 }
-.map-text p {
-  color: #94a3b8;
-  font-size: 16px;
-  line-height: 1.7;
-  margin: 0 0 28px;
-}
+.map-text p { color: #94a3b8; font-size: 16px; line-height: 1.7; margin: 0 0 28px; }
 .map-preview { display: flex; justify-content: center; }
 .map-mock {
   width: 100%;
@@ -568,15 +535,11 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
   background-image:
-    linear-gradient(rgba(51, 65, 85, 0.5) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(51, 65, 85, 0.5) 1px, transparent 1px);
+    linear-gradient(rgba(51,65,85,0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(51,65,85,0.5) 1px, transparent 1px);
   background-size: 40px 40px;
 }
-.map-pin {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  cursor: default;
-}
+.map-pin { position: absolute; transform: translate(-50%, -50%); cursor: default; }
 .map-pin span { font-size: 22px; display: block; }
 .pin-label {
   position: absolute;
@@ -594,13 +557,13 @@ onMounted(() => {
   position: absolute;
   width: 40px; height: 40px;
   border-radius: 50%;
-  background: rgba(239, 68, 68, 0.3);
+  background: rgba(239,68,68,0.3);
   transform: translate(-50%, -50%);
   animation: pulse 2s ease-out infinite;
 }
 @keyframes pulse {
-  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+  0%   { transform: translate(-50%,-50%) scale(0.5); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
 }
 
 /* ── CTA ── */
@@ -616,29 +579,18 @@ onMounted(() => {
   font-weight: 800;
   margin: 0 0 14px;
 }
-.cta-inner p {
-  font-size: 18px;
-  opacity: 0.85;
-  margin: 0 0 36px;
-}
+.cta-inner p { font-size: 18px; opacity: 0.85; margin: 0 0 36px; }
 .btn-large {
   font-size: 17px;
   padding: 16px 36px;
   background: white;
   color: #0369a1;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
 }
-.btn-large:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-}
+.btn-large:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
 
 /* ── FOOTER ── */
-.footer {
-  background: #0f172a;
-  color: #64748b;
-  padding: 24px 0;
-  font-size: 13px;
-}
+.footer { background: #0f172a; color: #64748b; padding: 24px 0; font-size: 13px; }
 .footer-inner {
   display: flex;
   align-items: center;
