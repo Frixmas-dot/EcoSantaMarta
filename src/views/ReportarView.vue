@@ -1,17 +1,6 @@
 <template>
   <div class="report-page">
 
-    <!-- NAV -->
-    <nav class="nav">
-      <div class="container nav-inner">
-        <router-link to="/" class="nav-logo">💧 AguaYa</router-link>
-        <div class="nav-links">
-          <router-link to="/mapa">Mapa</router-link>
-          <router-link to="/estadisticas">Estadísticas</router-link>
-          <router-link to="/reportar" class="nav-cta nav-active-cta">Reportar</router-link>
-        </div>
-      </div>
-    </nav>
 
     <!-- CONTENIDO -->
     <div class="page-body">
@@ -200,7 +189,6 @@ function enviar() {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap');
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 .report-page {
@@ -217,53 +205,6 @@ function enviar() {
   padding: 0 24px;
 }
 
-/* ── NAV ── */
-.nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  backdrop-filter: blur(14px);
-  background: rgba(255,255,255,0.88);
-  border-bottom: 1px solid #e2e8f0;
-}
-.nav-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-.nav-logo {
-  font-family: 'Sora', sans-serif;
-  font-weight: 800;
-  font-size: 18px;
-  color: #0369a1;
-  text-decoration: none;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.nav-links a {
-  text-decoration: none;
-  color: #334155;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color .2s;
-}
-.nav-links a:hover { color: #0369a1; }
-.nav-cta {
-  background: #0369a1 !important;
-  color: white !important;
-  padding: 8px 18px;
-  border-radius: 20px;
-}
-.nav-active-cta {
-  background: #075985 !important;
-}
 
 /* ── BODY ── */
 .page-body {

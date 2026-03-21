@@ -1,18 +1,6 @@
 <template>
   <div class="home">
 
-    <!-- NAV -->
-    <nav class="nav">
-      <div class="container nav-inner">
-        <span class="nav-logo">💧 AguaYa</span>
-        <div class="nav-links">
-          <router-link to="/mapa">Mapa</router-link>
-          <router-link to="/estadisticas">Estadisticas</router-link>
-          <router-link to="/reportar" class="nav-cta">Reportar</router-link>
-        </div>
-      </div>
-    </nav>
-
     <!-- HERO -->
     <section class="hero">
       <div class="hero-bg">
@@ -38,19 +26,21 @@
             Ver mapa en vivo →
           </router-link>
         </div>
+
+        <!-- STATS con contadores animados -->
         <div class="hero-stats">
           <div class="stat">
-            <strong>312</strong>
+            <strong>{{ counters.reportes }}</strong>
             <span>Reportes este mes</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
-            <strong>18</strong>
+            <strong>{{ counters.barrios }}</strong>
             <span>Barrios afectados</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
-            <strong>94%</strong>
+            <strong>{{ counters.verificados }}%</strong>
             <span>Reportes verificados</span>
           </div>
         </div>
@@ -98,7 +88,6 @@
             <h3>{{ step.title }}</h3>
             <p>{{ step.desc }}</p>
           </div>
-          <div class="steps-line"></div>
         </div>
       </div>
     </section>
@@ -143,7 +132,7 @@
     <!-- FOOTER -->
     <footer class="footer">
       <div class="container footer-inner">
-        <span class="nav-logo">💧 AguaYa</span>
+        <span class="footer-logo">💧 AguaYa</span>
         <p>Proyecto académico · Santa Marta, Colombia</p>
       </div>
     </footer>
@@ -152,24 +141,49 @@
 </template>
 
 <script setup>
+import { reactive, onMounted } from 'vue'
+
+// ── Datos ──────────────────────────────────────────────────
 const problemas = [
-  { id: 1, icon: '🚱', title: 'Sin agua', desc: 'Corte total del servicio en el sector.', color: '#ef4444' },
-  { id: 2, icon: '📉', title: 'Baja presión', desc: 'El agua llega con muy poca fuerza.', color: '#f97316' },
-  { id: 3, icon: '🟤', title: 'Agua sucia', desc: 'Agua con color, olor o sedimentos.', color: '#a16207' },
+  { id: 1, icon: '🚱', title: 'Sin agua',     desc: 'Corte total del servicio en el sector.', color: '#ef4444' },
+  { id: 2, icon: '📉', title: 'Baja presión', desc: 'El agua llega con muy poca fuerza.',     color: '#f97316' },
+  { id: 3, icon: '🟤', title: 'Agua sucia',   desc: 'Agua con color, olor o sedimentos.',     color: '#a16207' },
   { id: 4, icon: '🔧', title: 'Fuga o ruptura', desc: 'Tubería rota o fuga visible en la calle.', color: '#0ea5e9' },
 ]
 
 const pasos = [
-  { icon: '📝', title: 'Reporta', desc: 'Describe el problema e indica tu dirección o barrio.' },
-  { icon: '🗺️', title: 'Se publica', desc: 'El reporte aparece en el mapa público en segundos.' },
+  { icon: '📝', title: 'Reporta',      desc: 'Describe el problema e indica tu dirección o barrio.' },
+  { icon: '🗺️', title: 'Se publica',   desc: 'El reporte aparece en el mapa público en segundos.' },
   { icon: '👥', title: 'Se visibiliza', desc: 'Otros ciudadanos confirman el problema en su zona.' },
-  { icon: '📢', title: 'Se escala', desc: 'Las zonas críticas reciben mayor atención y presión.' },
+  { icon: '📢', title: 'Se escala',    desc: 'Las zonas críticas reciben mayor atención y presión.' },
 ]
+
+// ── Contadores animados ────────────────────────────────────
+const counters = reactive({ reportes: 0, barrios: 0, verificados: 0 })
+
+function animateCounter(key, target, duration = 1600) {
+  const start = performance.now()
+  const update = (now) => {
+    const progress = Math.min((now - start) / duration, 1)
+    // Ease out cubic: desacelera al final
+    const eased = 1 - Math.pow(1 - progress, 3)
+    counters[key] = Math.round(eased * target)
+    if (progress < 1) requestAnimationFrame(update)
+  }
+  requestAnimationFrame(update)
+}
+
+onMounted(() => {
+  // Pequeño delay para que el usuario vea el 0 antes de que arranquen
+  setTimeout(() => {
+    animateCounter('reportes',    312, 1800)
+    animateCounter('barrios',      18, 1400)
+    animateCounter('verificados',  94, 1600)
+  }, 300)
+})
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap');
-
 /* ── BASE ── */
 .home {
   font-family: 'Inter', sans-serif;
@@ -180,48 +194,6 @@ const pasos = [
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 24px;
-}
-
-/* ── NAV ── */
-.nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  backdrop-filter: blur(14px);
-  background: rgba(255,255,255,0.88);
-  border-bottom: 1px solid #e2e8f0;
-}
-.nav-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px;
-}
-.nav-logo {
-  font-family: 'Sora', sans-serif;
-  font-weight: 800;
-  font-size: 18px;
-  color: #0369a1;
-  text-decoration: none;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.nav-links a {
-  text-decoration: none;
-  color: #334155;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color .2s;
-}
-.nav-links a:hover, .nav-active { color: #0369a1 !important; font-weight: 600 !important; }
-.nav-cta {
-  background: #0369a1 !important;
-  color: white !important;
-  padding: 8px 18px;
-  border-radius: 20px;
 }
 
 /* ── HERO ── */
@@ -266,7 +238,7 @@ const pasos = [
 }
 @keyframes float {
   0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-30px) scale(1.05); }
+  50%       { transform: translateY(-30px) scale(1.05); }
 }
 
 .hero-content {
@@ -277,18 +249,28 @@ const pasos = [
   flex-direction: column;
   align-items: flex-start;
   max-width: 680px;
+
+  /* Entrada suave de todo el bloque */
+  animation: heroIn 0.8s ease both;
 }
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .hero-badge {
   display: inline-block;
-  background: rgba(3,105,161,0.1);
+  background: rgba(3, 105, 161, 0.1);
   color: #0369a1;
-  border: 1px solid rgba(3,105,161,0.2);
+  border: 1px solid rgba(3, 105, 161, 0.2);
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 24px;
+  animation: heroIn 0.8s ease 0.1s both;
 }
+
 .hero-title {
   font-family: 'Sora', sans-serif;
   font-size: clamp(42px, 6vw, 72px);
@@ -296,34 +278,48 @@ const pasos = [
   line-height: 1.1;
   color: #0f172a;
   margin: 0 0 20px;
+  animation: heroIn 0.8s ease 0.2s both;
 }
+
+/* Subrayado animado al cargar */
 .hero-highlight {
   color: #0369a1;
   position: relative;
+  display: inline-block;
 }
 .hero-highlight::after {
   content: '';
   position: absolute;
-  bottom: 4px; left: 0; right: 0;
+  bottom: 4px; left: 0;
   height: 6px;
   background: #bae6fd;
   z-index: -1;
   border-radius: 4px;
+  width: 0;
+  animation: underlineGrow 0.7s ease 0.9s forwards;
 }
+@keyframes underlineGrow {
+  to { width: 100%; }
+}
+
 .hero-sub {
   font-size: 18px;
   color: #475569;
   max-width: 520px;
   line-height: 1.7;
   margin: 0 0 36px;
+  animation: heroIn 0.8s ease 0.3s both;
 }
+
 .hero-actions {
   display: flex;
   gap: 16px;
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 56px;
+  animation: heroIn 0.8s ease 0.4s both;
 }
+
 .btn-main {
   display: inline-flex;
   align-items: center;
@@ -335,41 +331,56 @@ const pasos = [
   text-decoration: none;
   font-weight: 600;
   font-size: 15px;
-  transition: transform .2s, box-shadow .2s;
-  box-shadow: 0 4px 20px rgba(3,105,161,0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(3, 105, 161, 0.35);
 }
 .btn-main:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(3,105,161,0.4);
+  box-shadow: 0 8px 28px rgba(3, 105, 161, 0.45);
 }
 .btn-ghost {
   color: #0369a1;
   text-decoration: none;
   font-weight: 600;
   font-size: 15px;
-  transition: opacity .2s;
+  transition: opacity 0.2s;
 }
 .btn-ghost:hover { opacity: 0.7; }
 
+/* ── STATS ── */
 .hero-stats {
   display: flex;
   align-items: center;
   gap: 32px;
   flex-wrap: wrap;
-  padding-top: 8px;
+  padding-top: 28px;
   border-top: 1px solid #cbd5e1;
   width: 100%;
+  animation: heroIn 0.8s ease 0.55s both;
 }
 .stat strong {
   display: block;
   font-family: 'Sora', sans-serif;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
   color: #0369a1;
+  /* shimmer sutil mientras el contador corre */
+  background: linear-gradient(90deg, #0369a1 0%, #0ea5e9 50%, #0369a1 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 2.5s linear 0.3s 2;
+}
+@keyframes shimmer {
+  from { background-position: 200% center; }
+  to   { background-position:   0% center; }
 }
 .stat span {
   font-size: 13px;
   color: #64748b;
+  margin-top: 2px;
+  display: block;
 }
 .stat-divider {
   width: 1px;
@@ -404,7 +415,7 @@ const pasos = [
   font-size: 16px;
 }
 
-/* ── PROBLEMAS ── */
+/* ── PROBLEM CARDS ── */
 .problem-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -417,10 +428,10 @@ const pasos = [
   background: white;
   border: 1.5px solid #e2e8f0;
   border-radius: 16px;
-  padding: 20px 20px;
+  padding: 20px;
   text-decoration: none;
   color: inherit;
-  transition: border-color .2s, transform .2s, box-shadow .2s;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
   position: relative;
   overflow: hidden;
 }
@@ -432,11 +443,22 @@ const pasos = [
   background: var(--accent);
   border-radius: 4px 0 0 4px;
 }
+/* Fondo con el color del acento, muy sutil al hover */
+.problem-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
 .problem-card:hover {
   border-color: var(--accent);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
 }
+.problem-card:hover::after { opacity: 0.04; }
 .problem-icon {
   font-size: 32px;
   flex-shrink: 0;
@@ -457,10 +479,10 @@ const pasos = [
   color: #94a3b8;
   font-size: 18px;
   flex-shrink: 0;
-  transition: transform .2s, color .2s;
+  transition: transform 0.2s, color 0.2s;
 }
 .problem-card:hover .problem-arrow {
-  transform: translateX(4px);
+  transform: translateX(5px);
   color: var(--accent);
 }
 
@@ -477,8 +499,12 @@ const pasos = [
   border-radius: 20px;
   padding: 32px 24px;
   text-align: center;
-  position: relative;
-  z-index: 1;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.step:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(3, 105, 161, 0.1);
+  border-color: #bae6fd;
 }
 .step-number {
   font-family: 'Sora', sans-serif;
@@ -531,10 +557,7 @@ const pasos = [
   line-height: 1.7;
   margin: 0 0 28px;
 }
-.map-preview {
-  display: flex;
-  justify-content: center;
-}
+.map-preview { display: flex; justify-content: center; }
 .map-mock {
   width: 100%;
   max-width: 420px;
@@ -545,8 +568,8 @@ const pasos = [
   position: relative;
   overflow: hidden;
   background-image:
-    linear-gradient(rgba(51,65,85,0.5) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(51,65,85,0.5) 1px, transparent 1px);
+    linear-gradient(rgba(51, 65, 85, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(51, 65, 85, 0.5) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 .map-pin {
@@ -571,12 +594,12 @@ const pasos = [
   position: absolute;
   width: 40px; height: 40px;
   border-radius: 50%;
-  background: rgba(239,68,68,0.3);
+  background: rgba(239, 68, 68, 0.3);
   transform: translate(-50%, -50%);
   animation: pulse 2s ease-out infinite;
 }
 @keyframes pulse {
-  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
 }
 
@@ -603,10 +626,10 @@ const pasos = [
   padding: 16px 36px;
   background: white;
   color: #0369a1;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 .btn-large:hover {
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* ── FOOTER ── */
@@ -622,6 +645,12 @@ const pasos = [
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
+}
+.footer-logo {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: #94a3b8;
 }
 
 /* ── RESPONSIVE ── */

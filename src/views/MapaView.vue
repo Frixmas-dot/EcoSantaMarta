@@ -1,18 +1,6 @@
 <template>
   <div class="map-page">
 
-    <!-- NAV -->
-    <nav class="nav">
-      <div class="container nav-inner">
-        <router-link to="/" class="nav-logo">💧 AguaYa</router-link>
-        <div class="nav-links">
-          <router-link to="/mapa" class="nav-active">Mapa</router-link>
-          <router-link to="/estadisticas">Estadísticas</router-link>
-          <router-link to="/reportar" class="nav-cta">Reportar</router-link>
-        </div>
-      </div>
-    </nav>
-
     <!-- PAGE HEADER -->
     <section class="page-header">
       <div class="container">
@@ -169,7 +157,6 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap');
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -185,47 +172,6 @@ export default {
   padding: 0 24px;
 }
 
-/* ── NAV ── */
-.nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 1000;
-  backdrop-filter: blur(14px);
-  background: rgba(255,255,255,0.88);
-  border-bottom: 1px solid #e2e8f0;
-}
-.nav-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px;
-}
-.nav-logo {
-  font-family: 'Sora', sans-serif;
-  font-weight: 800;
-  font-size: 18px;
-  color: #0369a1;
-  text-decoration: none;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.nav-links a {
-  text-decoration: none;
-  color: #334155;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color .2s;
-}
-.nav-links a:hover, .nav-active { color: #0369a1 !important; font-weight: 600 !important; }
-.nav-cta {
-  background: #0369a1 !important;
-  color: white !important;
-  padding: 8px 18px;
-  border-radius: 20px;
-}
 
 /* ── PAGE HEADER ── */
 .page-header {

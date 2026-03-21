@@ -1,91 +1,94 @@
 <template>
-
-<nav class="navbar">
-
-<div class="container">
-
-<div class="logo">
-💧 AguaYa
-</div>
-
-<div class="links">
-
-<router-link to="/" class="nav-link">
-Inicio
-</router-link>
-
-<router-link to="/mapa" class="nav-link">
-Mapa
-</router-link>
-
-<router-link to="/estadisticas" class="nav-link">
-Estadísticas
-</router-link>
-
-<router-link to="/reportar" class="btn-report">
-Reportar
-</router-link>
-
-</div>
-
-</div>
-
-</nav>
-
+  <nav class="nav">
+    <div class="nav-inner">
+      <router-link to="/" class="nav-logo-link">
+        <AguaYaLogoNav />
+      </router-link>
+      <div class="nav-links">
+        <router-link to="/mapa">Mapa</router-link>
+        <router-link to="/estadisticas">Estadísticas</router-link>
+        <router-link to="/reportar" class="nav-cta">Reportar</router-link>
+      </div>
+    </div>
+  </nav>
 </template>
 
-<style>
-
-.navbar{
-background: linear-gradient(135deg,#0077ff,#00b4ff);
-padding:15px 0;
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
+<style scoped>
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.container{
-width:90%;
-margin:auto;
-display:flex;
-justify-content:space-between;
-align-items:center;
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-.logo{
-color:white;
-font-size:22px;
-font-weight:bold;
+.nav-logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
-.links{
-display:flex;
-align-items:center;
-gap:20px;
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 
-.nav-link{
-color:white;
-text-decoration:none;
-font-weight:500;
-transition:0.3s;
+.nav-links a {
+  text-decoration: none;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
-.nav-link:hover{
-opacity:0.7;
+/* Vue Router agrega esta clase automáticamente al link de la ruta activa */
+.nav-links a.router-link-active {
+  color: #0369a1;
+  font-weight: 600;
 }
 
-.btn-report{
-background:white;
-color:#0077ff;
-padding:8px 16px;
-border-radius:20px;
-text-decoration:none;
-font-weight:bold;
-transition:0.3s;
+.nav-cta {
+  background: #0369a1;
+  color: white !important;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 600 !important;
 }
 
-.btn-report:hover{
-background:#f2f2f2;
-transform:scale(1.05);
+/* Cuando /reportar está activa, oscurecer el botón en vez de cambiar color */
+.nav-cta.router-link-active {
+  background: #075985;
+  color: white !important;
 }
 
+@media (max-width: 600px) {
+  .nav-links {
+    gap: 14px;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+  }
+
+  .nav-cta {
+    padding: 7px 14px;
+  }
+}
 </style>
+
+<script setup>
+import AguaYaLogoNav from '@/components/AguaYaLogoNav.vue'
+</script>

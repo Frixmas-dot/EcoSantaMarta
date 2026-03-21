@@ -1,17 +1,24 @@
 <template>
-
-<AppNavbar />
-
-<router-view />
-
+  <AppNavbar />
+  <router-view />
 </template>
 
-<script>
+<script setup>
+import AppNavbar from '@/components/AppNavbar.vue'
+</script>
 
-import AppNavbar from "./components/AppNavbar.vue"
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap');
 
-export default {
-components:{AppNavbar}
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-</script>
+body {
+  font-family: 'Inter', sans-serif;
+  color: #0f172a;
+  background: #fff;
+}
+</style>

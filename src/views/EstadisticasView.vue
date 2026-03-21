@@ -1,18 +1,6 @@
 <template>
   <div class="stats-page">
 
-    <!-- NAV (igual que Home) -->
-    <nav class="nav">
-      <div class="container nav-inner">
-        <router-link to="/" class="nav-logo">💧 AguaYa</router-link>
-        <div class="nav-links">
-          <router-link to="/mapa">Mapa</router-link>
-          <router-link to="/estadisticas" class="nav-active">Estadísticas</router-link>
-          <router-link to="/reportar" class="nav-cta">Reportar</router-link>
-        </div>
-      </div>
-    </nav>
-
     <!-- HEADER -->
     <section class="page-header">
       <div class="container">
@@ -152,10 +140,10 @@
 
 <script setup>
 const kpis = [
-  { icon: '📋', value: '132', label: 'Reportes este mes', trend: '12% vs mes anterior', up: true },
-  { icon: '🏘️', value: '48',  label: 'Barrios afectados',  trend: '3 nuevos',             up: true },
-  { icon: '✅', value: '76%', label: 'Problemas resueltos', trend: '8% vs mes anterior',  up: true },
-  { icon: '⏱️', value: '2.4d', label: 'Tiempo promedio de atención', trend: '0.5d menos', up: true },
+  { icon: '📋', value: '132', label: 'Reportes este mes',   trend: '+12%',    up: true },
+  { icon: '🏘️', value: '48',  label: 'Barrios afectados',   trend: '+3',      up: true },
+  { icon: '✅', value: '76%', label: 'Problemas resueltos', trend: '+8%',     up: true },
+  { icon: '⏱️', value: '2.4d', label: 'Tiempo de atención', trend: '-0.5d',   up: true },
 ]
 
 const barData = [
@@ -182,7 +170,7 @@ const barrios = [
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap');
+
 
 /* ── BASE ── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -198,47 +186,6 @@ const barrios = [
   padding: 0 24px;
 }
 
-/* ── NAV ── */
-.nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  backdrop-filter: blur(14px);
-  background: rgba(255,255,255,0.88);
-  border-bottom: 1px solid #e2e8f0;
-}
-.nav-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px;
-}
-.nav-logo {
-  font-family: 'Sora', sans-serif;
-  font-weight: 800;
-  font-size: 18px;
-  color: #0369a1;
-  text-decoration: none;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.nav-links a {
-  text-decoration: none;
-  color: #334155;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color .2s;
-}
-.nav-links a:hover, .nav-active { color: #0369a1 !important; font-weight: 600 !important; }
-.nav-cta {
-  background: #0369a1 !important;
-  color: white !important;
-  padding: 8px 18px;
-  border-radius: 20px;
-}
 
 /* ── PAGE HEADER ── */
 .page-header {
@@ -288,10 +235,11 @@ const barrios = [
   border-radius: 18px;
   padding: 24px 20px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   animation: fadeUp 0.5s ease both;
   transition: transform .2s, box-shadow .2s;
+  overflow: hidden;
 }
 .kpi-card:hover {
   transform: translateY(-3px);
@@ -325,8 +273,11 @@ const barrios = [
   font-weight: 600;
   padding: 4px 8px;
   border-radius: 20px;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
+  text-align: center;
   flex-shrink: 0;
+  max-width: 80px;
 }
 .kpi-trend.up   { background: #dcfce7; color: #16a34a; }
 .kpi-trend.down { background: #fee2e2; color: #dc2626; }
