@@ -115,7 +115,13 @@
                 </div>
               </div>
 
-              <button class="btn-submit" @click="enviar">
+              <!-- Mensaje de geocodificación -->
+              <div v-if="geocodificando" class="geo-status">
+                <span class="geo-spinner"></span>
+                Buscando ubicación de "{{ form.barrio }}"...
+              </div>
+
+              <button class="btn-submit" @click="enviar" :disabled="cargando">
                 <span v-if="!cargando">📍 Enviar reporte</span>
                 <span v-else class="loader"></span>
               </button>
@@ -139,34 +145,43 @@
 </template>
 
 <script>
+import { useWaterReportsStore } from '@/stores/waterReports'
+
 export default {
   name: 'ReportarView',
+
   data() {
     return {
-      enviado: false,
-      cargando: false,
+      enviado:        false,
+      cargando:       false,
+      geocodificando: false,
+
       form: {
-        barrio: '',
-        tipo: '',
+        barrio:      '',
+        tipo:        '',
         descripcion: '',
-        urgencia: 'media',
+        urgencia:    'media',
       },
+
       errors: {
-        barrio: false,
-        tipo: false,
+        barrio:      false,
+        tipo:        false,
         descripcion: false,
       },
+
       tipos: [
-        { id: 'sin-agua',      label: 'Sin agua',     icon: '🚱', color: '#ef4444' },
-        { id: 'baja-presion',  label: 'Baja presión', icon: '📉', color: '#f97316' },
-        { id: 'agua-sucia',    label: 'Agua sucia',   icon: '🟤', color: '#a16207' },
-        { id: 'fuga',          label: 'Fuga',         icon: '🔧', color: '#0ea5e9' },
+        { id: 'sin-agua',     label: 'Sin agua',     icon: '🚱', color: '#ef4444' },
+        { id: 'baja-presion', label: 'Baja presión', icon: '📉', color: '#f97316' },
+        { id: 'agua-sucia',   label: 'Agua sucia',   icon: '🟤', color: '#a16207' },
+        { id: 'fuga',         label: 'Fuga',         icon: '🔧', color: '#0ea5e9' },
       ],
+
       urgencias: [
         { id: 'baja',  label: 'Baja',  icon: '🟢', color: '#16a34a' },
         { id: 'media', label: 'Media', icon: '🟠', color: '#ea580c' },
         { id: 'alta',  label: 'Alta',  icon: '🔴', color: '#dc2626' },
       ],
+
       pasos: [
         { title: 'Completa el formulario', desc: 'Indica tu barrio, tipo de problema y descripción.' },
         { title: 'Se publica en el mapa',  desc: 'El reporte aparece de inmediato para todos.' },
@@ -174,23 +189,37 @@ export default {
       ],
     }
   },
+
   methods: {
     seleccionarTipo(id) {
-      this.form.tipo = id
-      this.errors.tipo = false
+      this.form.tipo    = id
+      this.errors.tipo  = false
     },
-    enviar() {
+
+    async enviar() {
+      // Validaciones
       this.errors.barrio      = !this.form.barrio.trim()
       this.errors.tipo        = !this.form.tipo
       this.errors.descripcion = this.form.descripcion.trim().length < 10
 
       if (this.errors.barrio || this.errors.tipo || this.errors.descripcion) return
 
-      this.cargando = true
-      setTimeout(() => {
-        this.cargando = false
-        this.enviado  = true
-      }, 1200)
+      this.cargando       = true
+      this.geocodificando = true
+
+      const store = useWaterReportsStore()
+
+      // Llama al store — internamente llama a Nominatim y guarda el reporte
+      await store.agregarReporte({
+        barrio:   this.form.barrio,
+        tipoId:   this.form.tipo,
+        desc:     this.form.descripcion,
+        urgencia: this.form.urgencia,
+      })
+
+      this.geocodificando = false
+      this.cargando       = false
+      this.enviado        = true
     },
   },
 }
@@ -377,6 +406,27 @@ export default {
   font-weight: 600;
 }
 
+/* ── GEO STATUS ── */
+.geo-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #0369a1;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.geo-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid #bae6fd;
+  border-top-color: #0369a1;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
+}
+
 /* ── SUBMIT ── */
 .btn-submit {
   width: 100%;
@@ -396,11 +446,12 @@ export default {
   min-height: 50px;
   box-shadow: 0 4px 20px rgba(3,105,161,0.3);
 }
-.btn-submit:hover {
+.btn-submit:hover:not(:disabled) {
   background: #0284c7;
   transform: translateY(-1px);
   box-shadow: 0 6px 24px rgba(3,105,161,0.4);
 }
+.btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
 .loader {
   width: 18px; height: 18px;
   border: 2px solid rgba(255,255,255,0.4);

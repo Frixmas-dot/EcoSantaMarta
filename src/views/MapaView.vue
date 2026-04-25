@@ -94,22 +94,18 @@
 <script>
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-
-const todosLosReportes = [
-  { barrio: 'El Rodadero', desc: 'Sin agua desde ayer en el sector.', tipo: 'Sin agua',     icon: '🚱', color: '#ef4444', tiempo: 'Hace 2h',  lat: 11.205,  lng: -74.225 },
-  { barrio: 'Centro',      desc: 'Baja presión en el servicio.',       tipo: 'Baja presión', icon: '📉', color: '#f97316', tiempo: 'Hace 4h',  lat: 11.244,  lng: -74.211 },
-  { barrio: 'Gaira',       desc: 'Agua con sedimentos y color marrón.',tipo: 'Agua sucia',   icon: '🟤', color: '#a16207', tiempo: 'Hace 5h',  lat: 11.225,  lng: -74.195 },
-  { barrio: 'Bastidas',    desc: 'Fuga visible en tubería principal.',  tipo: 'Fuga',         icon: '🔧', color: '#0ea5e9', tiempo: 'Hace 6h',  lat: 11.252,  lng: -74.185 },
-  { barrio: 'Pescaíto',    desc: 'Corte total sin aviso previo.',       tipo: 'Sin agua',     icon: '🚱', color: '#ef4444', tiempo: 'Hace 7h',  lat: 11.248,  lng: -74.200 },
-  { barrio: 'La Paz',      desc: 'Presión muy baja desde la mañana.',   tipo: 'Baja presión', icon: '📉', color: '#f97316', tiempo: 'Hace 9h',  lat: 11.235,  lng: -74.220 },
-]
+import { useWaterReportsStore } from '@/stores/waterReports'
 
 export default {
   name: 'MapaView',
+
   data() {
     return {
       filtroActivo: 'todos',
       mostrarPanel: true,
+      marcadores:   [],
+      map:          null,
+
       filtros: [
         { id: 'todos',        label: 'Todos',        icon: '🗺️', color: '#0369a1' },
         { id: 'Sin agua',     label: 'Sin agua',     icon: '🚱', color: '#ef4444' },
@@ -117,28 +113,40 @@ export default {
         { id: 'Agua sucia',   label: 'Agua sucia',   icon: '🟤', color: '#a16207' },
         { id: 'Fuga',         label: 'Fugas',        icon: '🔧', color: '#0ea5e9' },
       ],
-      marcadores: [],
-      map: null,
     }
   },
+
   computed: {
+    store() {
+      return useWaterReportsStore()
+    },
+
     reportesFiltrados() {
-      if (this.filtroActivo === 'todos') return todosLosReportes
-      return todosLosReportes.filter(r => r.tipo === this.filtroActivo)
+      const lista = this.store.reportesConMeta
+      if (this.filtroActivo === 'todos') return lista
+      return lista.filter(r => r.tipo === this.filtroActivo)
     },
   },
+
   watch: {
-    filtroActivo() { this.actualizarMarcadores() },
+    // Cuando cambia el filtro o llega un nuevo reporte, actualizar marcadores
+    reportesFiltrados() {
+      this.actualizarMarcadores()
+    },
   },
+
   mounted() {
     this.map = L.map('map').setView([11.2408, -74.199], 13)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.map)
     this.actualizarMarcadores()
   },
+
   methods: {
     actualizarMarcadores() {
+      // Limpiar marcadores anteriores
       this.marcadores.forEach(m => m.remove())
       this.marcadores = []
+
       this.reportesFiltrados.forEach(r => {
         const icon = L.divIcon({
           className: '',
@@ -149,12 +157,19 @@ export default {
             border:3px solid white;
             box-shadow:0 2px 8px rgba(0,0,0,0.3);
           "></div>`,
-          iconSize: [14, 14],
+          iconSize:   [14, 14],
           iconAnchor: [7, 7],
         })
+
         const m = L.marker([r.lat, r.lng], { icon })
           .addTo(this.map)
-          .bindPopup(`<strong>${r.barrio}</strong><br>${r.icon} ${r.tipo}<br><small>${r.desc}</small>`)
+          .bindPopup(`
+            <strong>${r.barrio}</strong><br>
+            ${r.icon} ${r.tipo}<br>
+            <small>${r.desc}</small><br>
+            <small style="color:#94a3b8">${r.tiempo}</small>
+          `)
+
         this.marcadores.push(m)
       })
     },
@@ -163,7 +178,6 @@ export default {
 </script>
 
 <style scoped>
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 .map-page {
@@ -205,10 +219,7 @@ export default {
   line-height: 1.1;
   margin-bottom: 12px;
 }
-.page-desc {
-  color: #64748b;
-  font-size: 16px;
-}
+.page-desc { color: #64748b; font-size: 16px; }
 
 /* ── FILTROS ── */
 .filters-bar {
@@ -225,12 +236,7 @@ export default {
   gap: 10px;
   flex-wrap: wrap;
 }
-.filters-label {
-  font-size: 13px;
-  color: #94a3b8;
-  font-weight: 500;
-  margin-right: 4px;
-}
+.filters-label { font-size: 13px; color: #94a3b8; font-weight: 500; margin-right: 4px; }
 .filter-btn {
   border: 1.5px solid #e2e8f0;
   background: white;
@@ -243,15 +249,8 @@ export default {
   transition: all .2s;
   font-family: 'Inter', sans-serif;
 }
-.filter-btn:hover {
-  border-color: var(--fc);
-  color: var(--fc);
-}
-.filter-btn.active {
-  background: var(--fc);
-  border-color: var(--fc);
-  color: white;
-}
+.filter-btn:hover { border-color: var(--fc); color: var(--fc); }
+.filter-btn.active { background: var(--fc); border-color: var(--fc); color: white; }
 
 /* ── LAYOUT ── */
 .map-layout {
@@ -328,11 +327,7 @@ export default {
   padding: 20px 20px 16px;
   border-bottom: 1px solid #f1f5f9;
 }
-.panel-header h3 {
-  font-family: 'Sora', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-}
+.panel-header h3 { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; }
 .panel-count {
   font-size: 12px;
   background: #f1f5f9;
@@ -358,10 +353,7 @@ export default {
   transition: border-color .2s, transform .2s;
   cursor: default;
 }
-.report-card:hover {
-  border-color: var(--rc);
-  transform: translateX(3px);
-}
+.report-card:hover { border-color: var(--rc); transform: translateX(3px); }
 .report-dot {
   width: 10px; height: 10px;
   border-radius: 50%;
@@ -384,17 +376,8 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.report-time {
-  font-size: 11px;
-  color: #94a3b8;
-  flex-shrink: 0;
-}
-.report-desc {
-  font-size: 12px;
-  color: #64748b;
-  line-height: 1.5;
-  margin-bottom: 8px;
-}
+.report-time { font-size: 11px; color: #94a3b8; flex-shrink: 0; }
+.report-desc { font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
 .report-tag {
   display: inline-block;
   font-size: 11px;
@@ -405,10 +388,7 @@ export default {
   color: var(--rc);
   border: 1px solid color-mix(in srgb, var(--rc) 25%, white);
 }
-.panel-footer {
-  padding: 16px;
-  border-top: 1px solid #f1f5f9;
-}
+.panel-footer { padding: 16px; border-top: 1px solid #f1f5f9; }
 .btn-report {
   display: block;
   text-align: center;
@@ -421,18 +401,10 @@ export default {
   font-weight: 600;
   transition: background .2s, transform .2s;
 }
-.btn-report:hover {
-  background: #0284c7;
-  transform: translateY(-1px);
-}
+.btn-report:hover { background: #0284c7; transform: translateY(-1px); }
 
 /* ── FOOTER ── */
-.footer {
-  background: #0f172a;
-  color: #64748b;
-  padding: 24px 0;
-  font-size: 13px;
-}
+.footer { background: #0f172a; color: #64748b; padding: 24px 0; font-size: 13px; }
 .footer-inner {
   display: flex;
   align-items: center;
